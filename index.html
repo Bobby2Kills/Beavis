@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <title>Butt-head</title>
+</head>
+<body>
+    <script>
+        let buttHead;
+        let cursors;
+        let wasd;
+        let platforms;
+
+        function preload () {
+            this.load.atlas('idle', 'assets/44963.png','assets/spritearray.json');
+        }
+
+        function create () {
+            buttHead = this.physics.add.sprite(100, 200, 'idle');
+            buttHead.setScale(1.8),
+            buttHead.setBounce(0.2),
+            buttHead.setCollideWorldBounds(true);
+            platforms = this.physics.add.staticGroup();
+            platforms.create(0, 500).setScale(10).refreshBody();
+            this.physics.add.collider(buttHead, platforms);
+
+            cursors = this.input.keyboard.createCursorKeys()
+            shift = this.input.keyboard.addKeys(
+                {
+                    shift: Phaser.Input.Keyboard.KeyCodes.SHIFT
+                }
+            )
+            wasd = this.input.keyboard.addKeys(
+                { 
+                    'up': Phaser.Input.Keyboard.KeyCodes.W, 
+                    'down': Phaser.Input.Keyboard.KeyCodes.S, 
+                    'left': Phaser.Input.Keyboard.KeyCodes.A, 
+                    'right': Phaser.Input.Keyboard.KeyCodes.D 
+                });
+
+
+            this.anims.create({
+                key: 'idle',
+                frames: this.anims.generateFrameNames('idle',
+                    {
+                    prefix: 'idle',
+                    end:0,
+                    zeroPad:4,
+                    }),
+                    repeat:-1
+            })
+
+            this.anims.create({
+                key: 'run',
+                frames: this.anims.generateFrameNames('idle',
+                {
+                    prefix: 'run',
+                    frames: [0,1,2,3,4,5],
+                    zeroPad:4
+                }),
+                framerate:100,
+                repeat: -1,
+            })
+
+            this.anims.create({
+                key: 'skid',
+                frames: this.anims.generateFrameNames('idle',
+                {
+                    prefix: 'skid',
+                    end:0,
+                    zeroPad:4
+                }),
+                repeat: -1,
+            })
+
+            this.anims.create({
+                key: 'walk',
+                frames: this.anims.generateFrameNames('idle', 
+                {
+                    prefix: 'walk',
+                    start:1,
+                    end: 10,
+                    zeroPad:4
+                }),
+                repeat: -1,
+            })
+            this.anims.create({
+                key: 'jump',
+                frames: this.anims.generateFrameNames('idle', 
+                {
+                    prefix: 'jump',
+                    start:0,
+                    end: 7,
+                    zeroPad:4
+                }),
+                repeat: -1,
+            })
+
+            this.anims.create({
+                key: 'hop',
+                frames: this.anims.generateFrameNames('idle', 
+                {
+                    prefix: 'hop',
+                    end: 1,
+                    zeroPad:4
+                }),
+                repeat: -1,
+            })
+
+        }
+
+        function update () {
+            const i = [-400, -290, 290, 400, -200]
+            const movingRight = cursors.right.isDown || wasd.right.isDown
+            const movingLeft = cursors.left.isDown || wasd.left.isDown
+            const moving = movingRight || movingLeft
+
+// left movements
+        //walk
+            if (movingLeft) {
+                buttHead.flipX = true
+
+                if (buttHead.body.onFloor() && cursors.shift.isUp){
+                    buttHead.setVelocityX(i[1])
+                    buttHead.anims.play('walk', true)
+                //jump
+                    if (cursors.space.isDown){
+                        if(buttHead.body.onFloor()){
+                            buttHead.setVelocityY(i[4])
+                            buttHead.setVelocityX(i[1])
+                            buttHead.anims.play('jump',true)
+                        }   
+                    }  
+                }
+        //run
+                else if (buttHead.body.onFloor() && cursors.shift.isDown){
+                    buttHead.setVelocityX(i[0])
+                    buttHead.anims.play('run', true)
+                //jump
+                    if (cursors.space.isDown){
+                            if(buttHead.body.onFloor()){
+                                buttHead.setVelocityY(i[4])
+                                buttHead.setVelocityX(i[0])
+                                buttHead.anims.play('jump',true)
+                            }   
+                    }
+                                if (cursors.shift.onUp("shift")){
+                                 buttHead.anims.play('skid', true)
+                                 buttHead.setVelocityX(i[50])
+            }
+                }  
+            }
+
+//right movements
+        //walk
+            else if (movingRight) {
+                buttHead.flipX = false
+                if (buttHead.body.onFloor() && cursors.shift.isUp){
+                    buttHead.setVelocityX(i[2])
+                    buttHead.anims.play('walk', true)
+                //jump
+                    if (cursors.space.isDown){
+                        if(buttHead.body.onFloor()){
+                            buttHead.setVelocityY(i[4])
+                            buttHead.setVelocityX(i[2])
+                            buttHead.anims.play('jump',true)
+                        }   
+                    }  
+                }
+        //run
+                else if (buttHead.body.onFloor() && cursors.shift.isDown){
+                    buttHead.setVelocityX(i[3])
+                    buttHead.anims.play('run', true)
+                //jump
+                    if (cursors.space.isDown){
+                            if(buttHead.body.onFloor()){
+                                buttHead.setVelocityY(i[4])
+                                buttHead.setVelocityX(i[3])
+                                buttHead.anims.play('jump',true)
+                            }   
+                    }
+                }  
+            }
+
+            else if (!(moving)){
+                buttHead.setVelocityX(0)
+                buttHead.anims.play('idle', true)
+                if (cursors.space.isDown){
+                buttHead.setVelocityY(i[4])
+                buttHead.anims.play('hop', true)
+                if(movingLeft){
+                    buttHead.flipX = true      
+                }
+            }
+            }
+        }
+        
+
+        //     // //skidding
+        //     // if (cursors.shift.onUp("shift")){
+        //     //     buttHead.anims.play('skid', true)
+        //     //     buttHead.flipX = false
+        //     // }
+        // }
+
+        new Phaser.Game({
+            type: Phaser.AUTO,
+            width: 900,
+            height:600,
+            backgroundColor: '#FFF',
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: {y:300},
+                    debug:false
+                }
+            },
+            scene: { preload, create, update }
+        })
+    </script>
+    
+</body>
+</html>

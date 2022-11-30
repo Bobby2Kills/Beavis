@@ -1,0 +1,46 @@
+function update () {
+    //walking
+    if (cursors.left.isDown || wasd.left.isDown) {
+        buttHead.setVelocityX(-290)
+        buttHead.flipX = true
+        buttHead.anims.play('walk', true)
+    } else if (cursors.right.isDown || wasd.right.isDown) {
+        buttHead.setVelocityX(290),
+        buttHead.flipX = false,
+        buttHead.anims.play('walk', true)
+    } 
+    //running
+    else if ((cursors.left.isDown && cursors.shift.isDown) || (wasd.left.isDown && cursors.shift.isDown)) {
+        buttHead.setVelocityX(-400)
+        buttHead.flipX = true
+        buttHead.anims.play('run', true)
+    }
+    else if ((cursors.right.isDown && cursors.shift.isDown) || (wasd.right.isDown && cursors.shift.isDown)) {
+        buttHead.setVelocityX(400),
+        buttHead.flipX = false,
+        buttHead.anims.play('run', true)
+    }
+
+    //jump
+    else if ((cursors.left.isDown && cursors.up.isDown) || (wasd.left.isDown && cursors.up.isDown)) {
+        buttHead.setVelocityY(-200)
+        buttHead.flipX = true
+        buttHead.anims.play('jump', true)
+    }
+    else if ((cursors.right.isDown && cursors.up.isDown) || (wasd.right.isDown && cursors.up.isDown)) {
+        buttHead.setVelocityY(-200)
+        buttHead.flipX = false
+        buttHead.anims.play('jump', true)
+    }
+    
+
+    // //skidding
+    else if (cursors.shift.onUp("shift")){
+        buttHead.anims.play('skid', true)
+        buttHead.flipX = false
+    }
+    else {
+        buttHead.setVelocityX(0)
+        buttHead.anims.play('idle', true)
+    }
+}
