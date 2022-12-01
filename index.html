@@ -16,16 +16,45 @@
 
         function preload () {
             this.load.atlas('idle', 'assets/44963.png','assets/spritearray.json');
+            this.load.image('pastelSet','map/tilemap.png')
+            this.load.image('dawnBackground','map/dawnbackground.png')
+            this.load.image('cloud','map/demo01_PixelSky_layer03.png')
+            this.load.image('greenIsland', 'map/free_edition.png')
+            this.load.tilemapTiledJSON('tilemap', 'map/map.json')
+
+
         }
 
         function create () {
+            //Map
+            const map = this.make.tilemap({key: 'tilemap'})
+            const tileset = map.addTilesetImage('tilemap','pastelSet', 16, 16, 0, 1);
+            const tileset2 = map.addTilesetImage('dawnbackground','dawnBackground',16,16,0,0);
+            const tileset3 = map.addTilesetImage('greenIsland','greenIsland', 16,16,0,0);
+            const tileset4 = map.addTilesetImage('demo01_PixelSky_layer03','cloud', 16,16,0,0);
+
+            map.createLayer('water-background', tileset, 0,0);
+            map.createLayer('Road', tileset, 0,0);
+            map.createLayer('Grass', tileset, 0,0);
+            map.createLayer('sky', tileset2, 0,0);
+            map.createLayer('Pavement',tileset, 0,0);
+            map.createLayer('Buildings', tileset, 0,0);
+            map.createLayer('obstacles', tileset, 0,0);
+            map.createLayer('ledges',[tileset3,tileset4], 0,0);
+            map.createLayer('Crossings', tileset, 0,0);
+            map.createLayer('windowsndoors',tileset, 0,0);
+            map.createLayer('decorative', tileset, 0,0);
+            map.createLayer('grapple', tileset, 0,0);
+            map.createLayer('collectables', tileset3, 0,0);
+        
+            
             buttHead = this.physics.add.sprite(100, 200, 'idle');
-            buttHead.setScale(1.8),
+            buttHead.setScale(0.5),
             buttHead.setBounce(0.2),
             buttHead.setCollideWorldBounds(true);
-            platforms = this.physics.add.staticGroup();
-            platforms.create(0, 500).setScale(10).refreshBody();
-            this.physics.add.collider(buttHead, platforms);
+            // platforms = this.physics.add.staticGroup();
+            // platforms.create(0, 500).setScale(10).refreshBody();
+            // this.physics.add.collider(buttHead, platforms);
 
             cursors = this.input.keyboard.createCursorKeys()
             shift = this.input.keyboard.addKeys(
@@ -208,8 +237,8 @@
 
         new Phaser.Game({
             type: Phaser.AUTO,
-            width: 900,
-            height:600,
+            width: 960,
+            height:680,
             backgroundColor: '#FFF',
             physics: {
                 default: 'arcade',
