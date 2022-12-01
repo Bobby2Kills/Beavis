@@ -46,11 +46,11 @@
             map.createLayer('decorative', tileset, 0,0);
             map.createLayer('grapple', tileset, 0,0);
             map.createLayer('collectables', tileset3, 0,0);
+            map.createLayer('harmful', [tileset,tileset3], 0,0)
         
             
             buttHead = this.physics.add.sprite(100, 200, 'idle');
-            buttHead.setScale(0.5),
-            buttHead.setBounce(0.2),
+            buttHead.setScale(1.5),
             buttHead.setCollideWorldBounds(true);
             // platforms = this.physics.add.staticGroup();
             // platforms.create(0, 500).setScale(10).refreshBody();
@@ -90,7 +90,7 @@
                     frames: [0,1,2,3,4,5],
                     zeroPad:4
                 }),
-                framerate:100,
+                frameRate:20,
                 repeat: -1,
             })
 
@@ -116,6 +116,29 @@
                 }),
                 repeat: -1,
             })
+
+            this.anims.create({
+                key: 'up',
+                frames: this.anims.generateFrameNames('idle', 
+                {
+                    prefix: 'up',
+                    end: 5,
+                    zeroPad:4
+                }),
+                repeat: -1,
+            })
+
+            this.anims.create({
+                key: 'down',
+                frames: this.anims.generateFrameNames('idle', 
+                {
+                    prefix: 'down',
+                    end: 5,
+                    zeroPad:4
+                }),
+                repeat: -1,
+            })
+
             this.anims.create({
                 key: 'jump',
                 frames: this.anims.generateFrameNames('idle', 
@@ -136,16 +159,64 @@
                     end: 1,
                     zeroPad:4
                 }),
+                frameRate:20,
                 repeat: -1,
             })
 
+            this.anims.create({
+                key: 'grapple',
+                frames: this.anims.generateFrameNames('idle', 
+                {
+                    prefix: 'grapple',
+                    end: 0,
+                    zeroPad:4
+                }),
+                repeat: -1,
+            })
+
+            this.anims.create({
+                key: 'swing',
+                frames: this.anims.generateFrameNames('idle', 
+                {
+                    prefix: 'swing',
+                    end: 0,
+                    zeroPad:4
+                }),
+                repeat: -1,
+            })
+
+            this.anims.create({
+                key: 'hurt',
+                frames: this.anims.generateFrameNames('idle', 
+                {
+                    prefix: 'hurt',
+                    end: 4,
+                    zeroPad:4
+                }),
+                repeat: -1,
+            })
+
+            this.anims.create({
+                key: 'drown',
+                frames: this.anims.generateFrameNames('idle', 
+                {
+                    prefix: 'drown',
+                    end: 0,
+                    zeroPad:4
+                }),
+                repeat: -1,
+            })
         }
 
         function update () {
-            const i = [-400, -290, 290, 400, -200]
+            const i = [-200, -50, 50, 200, -100, 0]
             const movingRight = cursors.right.isDown || wasd.right.isDown
             const movingLeft = cursors.left.isDown || wasd.left.isDown
-            const moving = movingRight || movingLeft
+            const movingUp = cursors.up.isDown || wasd.up.isDown
+            const movingDown = cursors.down.isDown || wasd.down.isDown
+            const strafing = movingRight || movingLeft
+            const moving = movingRight || movingLeft || movingUp || movingDown
+            
 
 // left movements
         //walk
@@ -154,6 +225,7 @@
 
                 if (buttHead.body.onFloor() && cursors.shift.isUp){
                     buttHead.setVelocityX(i[1])
+                    buttHead.setVelocityY(i[5])
                     buttHead.anims.play('walk', true)
                 //jump
                     if (cursors.space.isDown){
@@ -164,9 +236,19 @@
                         }   
                     }  
                 }
+        // //move in air slow//
+        //         else if ((!buttHead.body.onFloor()) && cursors.shift.isUp && cursors.space.isDown){buttHead.setVelocityX(i[1])
+        //         buttHead.anims.play('hop', true)
+        //         }
+        //move in air fast//
+                // else if ((!buttHead.body.onFloor()) && cursors.shift.isDown && cursors.space.isDown && strafing){
+                //     buttHead.setVelocityX(i[0])
+                //     buttHead.anims.play('jump', true)
+                // }
         //run
                 else if (buttHead.body.onFloor() && cursors.shift.isDown){
                     buttHead.setVelocityX(i[0])
+                    buttHead.setVelocityY(i[5])
                     buttHead.anims.play('run', true)
                 //jump
                     if (cursors.space.isDown){
@@ -176,10 +258,10 @@
                                 buttHead.anims.play('jump',true)
                             }   
                     }
-                                if (cursors.shift.onUp("shift")){
-                                 buttHead.anims.play('skid', true)
-                                 buttHead.setVelocityX(i[50])
-            }
+                    // if (cursors.shift.onUp("shift")){
+                    //     buttHead.anims.play('skid', true)
+                    //     buttHead.setVelocityX(i[50])
+                    // }
                 }  
             }
 
@@ -187,8 +269,10 @@
         //walk
             else if (movingRight) {
                 buttHead.flipX = false
+                
                 if (buttHead.body.onFloor() && cursors.shift.isUp){
                     buttHead.setVelocityX(i[2])
+                    buttHead.setVelocityY(i[5])
                     buttHead.anims.play('walk', true)
                 //jump
                     if (cursors.space.isDown){
@@ -196,12 +280,28 @@
                             buttHead.setVelocityY(i[4])
                             buttHead.setVelocityX(i[2])
                             buttHead.anims.play('jump',true)
+                        }
+                        else{
+                            buttHead.setVelocityY(i[5])
+                            buttHead.setVelocityX(i[2])
+                            buttHead.anims.play('jump',true)
                         }   
                     }  
                 }
+        // //move in air slow//
+        //         else if ((!buttHead.body.onFloor()) && cursors.shift.isUp && strafing){
+        //             buttHead.setVelocityX(i[2])
+        //             buttHead.anims.play('hop', true)
+        //         }
+        //move in air fast//
+                // else if ((!buttHead.body.onFloor()) && cursors.shift.isDown && strafing){
+                //     buttHead.setVelocityX(i[3])
+                //     buttHead.anims.play('jump', true)
+                // }
         //run
                 else if (buttHead.body.onFloor() && cursors.shift.isDown){
                     buttHead.setVelocityX(i[3])
+                    buttHead.setVelocityY(i[5])
                     buttHead.anims.play('run', true)
                 //jump
                     if (cursors.space.isDown){
@@ -209,21 +309,30 @@
                                 buttHead.setVelocityY(i[4])
                                 buttHead.setVelocityX(i[3])
                                 buttHead.anims.play('jump',true)
-                            }   
+                            }
                     }
                 }  
             }
+//up movements
+            else if (movingUp) {
 
-            else if (!(moving)){
+            }
+//down movements
+            else if (movingDown) {
+
+            }
+//idle
+            else if ((!moving)){
                 buttHead.setVelocityX(0)
                 buttHead.anims.play('idle', true)
-                if (cursors.space.isDown){
+                if (cursors.space.isDown && buttHead.body.onFloor()){
                 buttHead.setVelocityY(i[4])
                 buttHead.anims.play('hop', true)
-                if(movingLeft){
-                    buttHead.flipX = true      
                 }
-            }
+                else if (cursors.space.isDown && (!buttHead.body.onFloor())){
+                buttHead.anims.play('hop', true)
+                
+                }
             }
         }
         
@@ -238,7 +347,7 @@
         new Phaser.Game({
             type: Phaser.AUTO,
             width: 960,
-            height:680,
+            height:640,
             backgroundColor: '#FFF',
             physics: {
                 default: 'arcade',
